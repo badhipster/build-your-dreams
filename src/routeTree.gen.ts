@@ -14,6 +14,7 @@ import { Route as CoordinatorRouteImport } from './routes/coordinator'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LearnerProfileRouteImport } from './routes/learner.profile'
 import { Route as LearnerDashboardRouteImport } from './routes/learner.dashboard'
+import { Route as InstructorSettingsRouteImport } from './routes/instructor.settings'
 import { Route as InstructorSessionsRouteImport } from './routes/instructor.sessions'
 
 const InstructorRoute = InstructorRouteImport.update({
@@ -41,6 +42,11 @@ const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
   path: '/learner/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InstructorSettingsRoute = InstructorSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => InstructorRoute,
+} as any)
 const InstructorSessionsRoute = InstructorSessionsRouteImport.update({
   id: '/sessions',
   path: '/sessions',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/coordinator': typeof CoordinatorRoute
   '/instructor': typeof InstructorRouteWithChildren
   '/instructor/sessions': typeof InstructorSessionsRoute
+  '/instructor/settings': typeof InstructorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/profile': typeof LearnerProfileRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/coordinator': typeof CoordinatorRoute
   '/instructor': typeof InstructorRouteWithChildren
   '/instructor/sessions': typeof InstructorSessionsRoute
+  '/instructor/settings': typeof InstructorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/profile': typeof LearnerProfileRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/coordinator': typeof CoordinatorRoute
   '/instructor': typeof InstructorRouteWithChildren
   '/instructor/sessions': typeof InstructorSessionsRoute
+  '/instructor/settings': typeof InstructorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/profile': typeof LearnerProfileRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/coordinator'
     | '/instructor'
     | '/instructor/sessions'
+    | '/instructor/settings'
     | '/learner/dashboard'
     | '/learner/profile'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/coordinator'
     | '/instructor'
     | '/instructor/sessions'
+    | '/instructor/settings'
     | '/learner/dashboard'
     | '/learner/profile'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/coordinator'
     | '/instructor'
     | '/instructor/sessions'
+    | '/instructor/settings'
     | '/learner/dashboard'
     | '/learner/profile'
   fileRoutesById: FileRoutesById
@@ -144,6 +156,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnerDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/instructor/settings': {
+      id: '/instructor/settings'
+      path: '/settings'
+      fullPath: '/instructor/settings'
+      preLoaderRoute: typeof InstructorSettingsRouteImport
+      parentRoute: typeof InstructorRoute
+    }
     '/instructor/sessions': {
       id: '/instructor/sessions'
       path: '/sessions'
@@ -156,10 +175,12 @@ declare module '@tanstack/react-router' {
 
 interface InstructorRouteChildren {
   InstructorSessionsRoute: typeof InstructorSessionsRoute
+  InstructorSettingsRoute: typeof InstructorSettingsRoute
 }
 
 const InstructorRouteChildren: InstructorRouteChildren = {
   InstructorSessionsRoute: InstructorSessionsRoute,
+  InstructorSettingsRoute: InstructorSettingsRoute,
 }
 
 const InstructorRouteWithChildren = InstructorRoute._addFileChildren(

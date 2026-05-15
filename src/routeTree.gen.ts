@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as InstructorRouteImport } from './routes/instructor'
+import { Route as CoordinatorRouteImport } from './routes/coordinator'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LearnerDashboardRouteImport } from './routes/learner.dashboard'
 
 const InstructorRoute = InstructorRouteImport.update({
   id: '/instructor',
   path: '/instructor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoordinatorRoute = CoordinatorRouteImport.update({
+  id: '/coordinator',
+  path: '/coordinator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,30 +37,34 @@ const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/coordinator': typeof CoordinatorRoute
   '/instructor': typeof InstructorRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/coordinator': typeof CoordinatorRoute
   '/instructor': typeof InstructorRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/coordinator': typeof CoordinatorRoute
   '/instructor': typeof InstructorRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/instructor' | '/learner/dashboard'
+  fullPaths: '/' | '/coordinator' | '/instructor' | '/learner/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/instructor' | '/learner/dashboard'
-  id: '__root__' | '/' | '/instructor' | '/learner/dashboard'
+  to: '/' | '/coordinator' | '/instructor' | '/learner/dashboard'
+  id: '__root__' | '/' | '/coordinator' | '/instructor' | '/learner/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CoordinatorRoute: typeof CoordinatorRoute
   InstructorRoute: typeof InstructorRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/instructor'
       fullPath: '/instructor'
       preLoaderRoute: typeof InstructorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coordinator': {
+      id: '/coordinator'
+      path: '/coordinator'
+      fullPath: '/coordinator'
+      preLoaderRoute: typeof CoordinatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CoordinatorRoute: CoordinatorRoute,
   InstructorRoute: InstructorRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
 }

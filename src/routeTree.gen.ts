@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LearnerDashboardRouteImport } from './routes/learner.dashboard'
 
+const InstructorRoute = InstructorRouteImport.update({
+  id: '/instructor',
+  path: '/instructor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -25,32 +31,43 @@ const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/instructor': typeof InstructorRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/instructor': typeof InstructorRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/instructor': typeof InstructorRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/learner/dashboard'
+  fullPaths: '/' | '/instructor' | '/learner/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/learner/dashboard'
-  id: '__root__' | '/' | '/learner/dashboard'
+  to: '/' | '/instructor' | '/learner/dashboard'
+  id: '__root__' | '/' | '/instructor' | '/learner/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  InstructorRoute: typeof InstructorRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/instructor': {
+      id: '/instructor'
+      path: '/instructor'
+      fullPath: '/instructor'
+      preLoaderRoute: typeof InstructorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  InstructorRoute: InstructorRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
 }
 export const routeTree = rootRouteImport

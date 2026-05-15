@@ -6,7 +6,8 @@ import { ROSTER, type Learner, type Status } from "@/components/attendance/data"
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { WifiOff, ChevronRight } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { WifiOff, ChevronRight, CheckCircle2, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/instructor")({
   head: () => ({
@@ -27,8 +28,18 @@ function Page() {
   const [editing, setEditing] = useState<Learner | null>(null);
   const [draftStatus, setDraftStatus] = useState<Status>("present");
   const [reason, setReason] = useState("");
+  const [confirmStage, setConfirmStage] = useState<"hidden" | "review" | "submitted">("hidden");
+  const [submittedAt, setSubmittedAt] = useState<string>("");
 
-  const checkedIn = roster.filter((r) => r.status === "present" || r.status === "late").length;
+  const counts = {
+    present: roster.filter((r) => r.status === "present").length,
+    late: roster.filter((r) => r.status === "late").length,
+    absent: roster.filter((r) => r.status === "absent").length,
+    excused: roster.filter((r) => r.status === "excused").length,
+    pending: roster.filter((r) => r.status === "pending").length,
+  };
+  const checkedIn = counts.present + counts.late;
+  const absentTotal = counts.absent + counts.pending;
 
   const openEdit = (l: Learner) => {
     setEditing(l);
@@ -41,6 +52,15 @@ function Page() {
     setRoster((r) => r.map((x) => (x.id === editing.id ? { ...x, status: draftStatus } : x)));
     setEditing(null);
   };
+
+  const openConfirm = () => setConfirmStage("review");
+  const submitRoster = () => {
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true });
+    setSubmittedAt(time);
+    setConfirmStage("submitted");
+  };
+  const closeConfirm = () => setConfirmStage("hidden");
 
   return (
     <MobileShell>
@@ -70,7 +90,12 @@ function Page() {
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">
                   {l.name.split(" ").map((n) => n[0]).join("")}
                 </span>
-                <span className="flex-1 text-sm font-medium">{l.name}</span>
+                <span className="flex-1">
+                  <span className="block text-sm font-medium">{l.name}</span>
+                  {l.checkInTime && (
+                    <span className="block text-[11px] text-muted-foreground">in at {l.checkInTime}</span>
+                  )}
+                </span>
                 <StatusDot status={l.status} />
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </button>
@@ -79,7 +104,9 @@ function Page() {
         </div>
 
         <div className="sticky bottom-[57px] z-10 border-t bg-background/95 p-3 backdrop-blur">
-          <Button className="w-full" size="lg">Confirm Roster</Button>
+          <Button className="w-full" size="lg" onClick={openConfirm}>
+            Confirm Roster
+          </Button>
         </div>
       </div>
 
@@ -121,6 +148,67 @@ function Page() {
           </div>
         </SheetContent>
       </Sheet>
+
+      <Dialog open={confirmStage !== "hidden"} onOpenChange={(o) => !o && closeConfirm()}>
+        <DialogContent className="max-w-[360px] rounded-2xl">
+          {confirmStage === "review" && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Confirm roster for Session 14</DialogTitle>
+              </DialogHeader>
+              <div className="mt-2 space-y-2 text-sm">
+                <div className="rounded-xl border bg-card p-3">
+                  <Row label="Present" value={counts.present} tone="text-success" />
+                  <Row label="Late" value={counts.late} tone="text-warning-foreground" />
+                  <Row label="Absent" value={absentTotal} tone="text-destructive" />
+                  {counts.excused > 0 && <Row label="Excused" value={counts.excused} tone="text-muted-foreground" />}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Once you submit, learners see their status within 5 minutes. Disputes open for 48 hours.
+                </p>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={closeConfirm}>Keep editing</Button>
+                <Button className="flex-1" onClick={submitRoster}>
+                  Submit to LMS <ArrowRight className="ml-1 h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </>
+          )}
+
+          {confirmStage === "submitted" && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="sr-only">Roster submitted</DialogTitle>
+              </DialogHeader>
+              <div className="flex flex-col items-center gap-3 py-2 text-center">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-success/15 text-success">
+                  <CheckCircle2 className="h-7 w-7" />
+                </span>
+                <div>
+                  <p className="text-base font-semibold">Roster submitted to LMS</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {counts.present} Present · {counts.late} Late · {absentTotal} Absent · synced at {submittedAt}
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Learners will receive a push notification within 5 minutes. You can still raise a correction up to end-of-day.
+                </p>
+                <Button className="w-full" onClick={closeConfirm}>Done</Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </MobileShell>
+  );
+}
+
+function Row({ label, value, tone }: { label: string; value: number; tone: string }) {
+  return (
+    <div className="flex items-center justify-between py-1.5 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={`font-semibold ${tone}`}>{value}</span>
+    </div>
   );
 }

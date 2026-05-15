@@ -4,17 +4,18 @@ export type Learner = {
   id: string;
   name: string;
   status: Status | "pending";
+  checkInTime?: string;
 };
 
 export const ROSTER: Learner[] = [
-  { id: "1", name: "Aarav Mehta", status: "present" },
-  { id: "2", name: "Diya Sharma", status: "present" },
-  { id: "3", name: "Kabir Ahuja", status: "late" },
-  { id: "4", name: "Riya Verma", status: "present" },
+  { id: "1", name: "Aarav Mehta", status: "present", checkInTime: "8:58 AM" },
+  { id: "2", name: "Diya Sharma", status: "present", checkInTime: "9:01 AM" },
+  { id: "3", name: "Kabir Ahuja", status: "late", checkInTime: "9:20 AM" },
+  { id: "4", name: "Riya Verma", status: "late", checkInTime: "9:20 AM" },
   { id: "5", name: "Ishaan Kapoor", status: "absent" },
-  { id: "6", name: "Ananya Iyer", status: "present" },
-  { id: "7", name: "Vihaan Singh", status: "late" },
-  { id: "8", name: "Saanvi Patel", status: "present" },
+  { id: "6", name: "Ananya Iyer", status: "late", checkInTime: "9:21 AM" },
+  { id: "7", name: "Vihaan Singh", status: "late", checkInTime: "9:22 AM" },
+  { id: "8", name: "Saanvi Patel", status: "present", checkInTime: "9:03 AM" },
   { id: "9", name: "Aditya Rao", status: "absent" },
   { id: "10", name: "Myra Joshi", status: "pending" },
 ];

@@ -76,10 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Mobile attendance prototype for the AI-LED Marketing program." },
       { name: "author", content: "Kraftshala" },
       { property: "og:title", content: "Kraftshala Attendance" },
-      { property: "og:description", content: "Mobile attendance prototype." },
+      { property: "og:description", content: "Mobile attendance prototype for the AI-LED Marketing program." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Kraftshala Attendance" },
+      { name: "twitter:description", content: "Mobile attendance prototype for the AI-LED Marketing program." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/138127d3-c553-4942-a2a5-3d51f63c7772/id-preview-97590e67--7233edad-9937-431c-8c56-1dbb11f18ce9.lovable.app-1778871724410.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/138127d3-c553-4942-a2a5-3d51f63c7772/id-preview-97590e67--7233edad-9937-431c-8c56-1dbb11f18ce9.lovable.app-1778871724410.png" },
     ],
     links: [
       {

@@ -1,162 +1,87 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ScanLine, Check, Clock, Info, MapPin, CalendarDays } from "lucide-react";
-import { MobileShell } from "@/components/attendance/Shell";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { GraduationCap, ScanLine, Users, LayoutDashboard, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "Check In · Kraftshala Attendance" },
-      { name: "description", content: "Scan to check in to today's session." },
-    ],
+    meta: [{ title: "Kraftshala Attendance · Sign in" }],
   }),
-  component: CheckInPage,
+  component: RolePicker,
 });
 
-type View = "idle" | "scanning" | "present" | "late";
+const roles = [
+  {
+    to: "/learner",
+    icon: ScanLine,
+    label: "Learner",
+    name: "Diya Sharma",
+    detail: "Cohort PGP-AI-LED-MKT-01",
+    tone: "bg-primary text-primary-foreground",
+  },
+  {
+    to: "/instructor",
+    icon: Users,
+    label: "Instructor",
+    name: "Anika Rao",
+    detail: "Session 14 · 30 learners",
+    tone: "bg-foreground text-background",
+  },
+  {
+    to: "/coordinator",
+    icon: LayoutDashboard,
+    label: "Coordinator",
+    name: "Vikram Nair",
+    detail: "Program leadership",
+    tone: "bg-success text-success-foreground",
+  },
+] as const;
 
-function CheckInPage() {
-  const [view, setView] = useState<View>("idle");
-
-  const startScan = () => {
-    setView("scanning");
-    setTimeout(() => setView("present"), 1600);
-  };
-
+function RolePicker() {
   return (
-    <MobileShell>
-      <div className="flex h-full flex-col gap-4 px-4 pt-4 pb-6">
-        <header>
-          <p className="text-xs font-medium text-muted-foreground">Today · 9:00 AM IST</p>
-          <h1 className="mt-1 text-xl font-semibold tracking-tight">Session 14</h1>
-          <p className="text-sm text-muted-foreground">AI for B2B Marketing</p>
-        </header>
-
-        <div className="rounded-2xl border bg-card p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Confirm before scanning</p>
-          <div className="mt-2 space-y-1.5 text-sm">
-            <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-muted-foreground" /> Wed 12 Mar · 9:00–11:00 AM</div>
-            <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-muted-foreground" /> Studio B, Kraftshala Campus</div>
-          </div>
-        </div>
-
-        {view === "idle" && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-6">
-            <div className="relative flex h-48 w-48 items-center justify-center rounded-3xl border-2 border-dashed border-primary/40 bg-primary/5">
-              <ScanLine className="h-16 w-16 text-primary/70" />
-            </div>
-            <Button size="lg" className="w-full" onClick={startScan}>
-              <ScanLine className="mr-2 h-4 w-4" /> Scan to Check In
-            </Button>
-            <button onClick={() => setView("late")} className="text-xs text-muted-foreground underline">
-              Preview late check-in state
-            </button>
-          </div>
-        )}
-
-        {view === "scanning" && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4">
-            <div className="relative h-48 w-48 overflow-hidden rounded-3xl border-2 border-primary bg-primary/10">
-              <div className="absolute inset-x-0 h-1 animate-[scan_1.4s_ease-in-out_infinite] bg-primary" style={{ top: 0 }} />
-              <ScanLine className="absolute inset-0 m-auto h-16 w-16 text-primary" />
-            </div>
-            <p className="text-sm font-medium">Reading QR…</p>
-            <style>{`@keyframes scan { 0%{top:0} 50%{top:calc(100% - 4px)} 100%{top:0} }`}</style>
-          </div>
-        )}
-
-        {view === "present" && (
-          <ResultCard
-            tone="success"
-            icon={<Check className="h-5 w-5" />}
-            title="You're marked Present"
-            time="9:02 AM"
-            note="Synced with the LMS · visible to your instructor."
-            onReset={() => setView("idle")}
-          />
-        )}
-
-        {view === "late" && (
-          <ResultCard
-            tone="warning"
-            icon={<Clock className="h-5 w-5" />}
-            title="Marked Late"
-            time="arrived 9:24 AM"
-            note={
-              <span className="inline-flex items-center gap-1">
-                Late after 9:15 AM grace window.
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button className="inline-flex items-center gap-0.5 underline"><Info className="h-3 w-3" /> Why?</button>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-[220px] text-xs">
-                      Sessions allow a 15-min grace. Check-ins after 9:15 AM are flagged Late automatically.
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </span>
-            }
-            onReset={() => setView("idle")}
-            dispute
-          />
-        )}
-      </div>
-    </MobileShell>
-  );
-}
-
-function ResultCard({
-  tone,
-  icon,
-  title,
-  time,
-  note,
-  onReset,
-  dispute,
-}: {
-  tone: "success" | "warning";
-  icon: React.ReactNode;
-  title: string;
-  time: string;
-  note: React.ReactNode;
-  onReset: () => void;
-  dispute?: boolean;
-}) {
-  const cls =
-    tone === "success"
-      ? "border-success/30 bg-success/10 text-success"
-      : "border-warning/40 bg-warning/15 text-warning-foreground";
-  return (
-    <div className="flex flex-1 flex-col gap-3">
-      <div className={`rounded-2xl border-2 p-5 ${cls}`}>
+    <div className="min-h-screen bg-muted/40 md:flex md:items-center md:justify-center md:py-8">
+      <div className="mx-auto flex min-h-screen w-full max-w-[420px] flex-col bg-background px-6 pt-10 pb-8 md:min-h-0 md:h-[860px] md:rounded-[2.25rem] md:border md:shadow-2xl">
         <div className="flex items-center gap-2">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-background/60">
-            {icon}
-          </span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <GraduationCap className="h-5 w-5" />
+          </div>
           <div>
-            <p className="text-base font-semibold leading-tight">{title}</p>
-            <p className="text-xs opacity-80">{time}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Kraftshala</p>
+            <p className="text-sm font-semibold leading-none">Attendance</p>
           </div>
         </div>
-        <p className="mt-3 text-sm text-foreground/90">{note}</p>
-        {dispute && (
-          <button className="mt-3 text-xs font-medium text-foreground underline">
-            This isn't right? Raise a dispute
-          </button>
-        )}
+
+        <div className="mt-10">
+          <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Pick the experience you want to demo. Each role sees a different app.
+          </p>
+        </div>
+
+        <div className="mt-6 space-y-3">
+          {roles.map((r) => {
+            const Icon = r.icon;
+            return (
+              <Link
+                key={r.to}
+                to={r.to}
+                className="group flex items-center gap-3 rounded-2xl border bg-card p-4 transition-colors hover:bg-muted/50"
+              >
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${r.tone}`}>
+                  <Icon className="h-5 w-5" />
+                </span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold">{r.label}</p>
+                  <p className="text-[11px] text-muted-foreground">{r.name} · {r.detail}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            );
+          })}
+        </div>
+
+        <p className="mt-auto pt-8 text-center text-[10px] text-muted-foreground">
+          Prototype · personas are isolated experiences, not a single app with a toggle.
+        </p>
       </div>
-      <Link to="/learner/dashboard" className="text-center text-xs font-medium text-muted-foreground underline">
-        View attendance dashboard →
-      </Link>
-      <Button variant="outline" onClick={onReset}>Reset demo</Button>
     </div>
   );
 }

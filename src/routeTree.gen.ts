@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LearnerRouteImport } from './routes/learner'
 import { Route as InstructorRouteImport } from './routes/instructor'
 import { Route as CoordinatorRouteImport } from './routes/coordinator'
 import { Route as LearnerIndexRouteImport } from './routes/learner.index'
@@ -19,6 +20,11 @@ import { Route as InstructorSessionsRouteImport } from './routes/instructor.sess
 import { Route as CoordinatorSettingsRouteImport } from './routes/coordinator.settings'
 import { Route as CoordinatorAlertsRouteImport } from './routes/coordinator.alerts'
 
+const LearnerRoute = LearnerRouteImport.update({
+  id: '/learner',
+  path: '/learner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InstructorRoute = InstructorRouteImport.update({
   id: '/instructor',
   path: '/instructor',
@@ -30,9 +36,9 @@ const CoordinatorRoute = CoordinatorRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnerIndexRoute = LearnerIndexRouteImport.update({
-  id: '/learner/',
-  path: '/learner/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => LearnerRoute,
 } as any)
 const LearnerProfileRoute = LearnerProfileRouteImport.update({
   id: '/profile',
@@ -68,6 +74,7 @@ const CoordinatorAlertsRoute = CoordinatorAlertsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/coordinator': typeof CoordinatorRouteWithChildren
   '/instructor': typeof InstructorRouteWithChildren
+  '/learner': typeof LearnerRouteWithChildren
   '/coordinator/alerts': typeof CoordinatorAlertsRoute
   '/coordinator/settings': typeof CoordinatorSettingsRoute
   '/instructor/sessions': typeof InstructorSessionsRoute
@@ -91,6 +98,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/coordinator': typeof CoordinatorRouteWithChildren
   '/instructor': typeof InstructorRouteWithChildren
+  '/learner': typeof LearnerRouteWithChildren
   '/coordinator/alerts': typeof CoordinatorAlertsRoute
   '/coordinator/settings': typeof CoordinatorSettingsRoute
   '/instructor/sessions': typeof InstructorSessionsRoute
@@ -104,6 +112,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/coordinator'
     | '/instructor'
+    | '/learner'
     | '/coordinator/alerts'
     | '/coordinator/settings'
     | '/instructor/sessions'
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/coordinator'
     | '/instructor'
+    | '/learner'
     | '/coordinator/alerts'
     | '/coordinator/settings'
     | '/instructor/sessions'
@@ -138,11 +148,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   CoordinatorRoute: typeof CoordinatorRouteWithChildren
   InstructorRoute: typeof InstructorRouteWithChildren
-  LearnerIndexRoute: typeof LearnerIndexRoute
+  LearnerRoute: typeof LearnerRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/learner': {
+      id: '/learner'
+      path: '/learner'
+      fullPath: '/learner'
+      preLoaderRoute: typeof LearnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/instructor': {
       id: '/instructor'
       path: '/instructor'
@@ -159,10 +176,10 @@ declare module '@tanstack/react-router' {
     }
     '/learner/': {
       id: '/learner/'
-      path: '/learner'
+      path: '/'
       fullPath: '/learner/'
       preLoaderRoute: typeof LearnerIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof LearnerRoute
     }
     '/learner/profile': {
       id: '/learner/profile'
@@ -237,10 +254,25 @@ const InstructorRouteWithChildren = InstructorRoute._addFileChildren(
   InstructorRouteChildren,
 )
 
+interface LearnerRouteChildren {
+  LearnerDashboardRoute: typeof LearnerDashboardRoute
+  LearnerProfileRoute: typeof LearnerProfileRoute
+  LearnerIndexRoute: typeof LearnerIndexRoute
+}
+
+const LearnerRouteChildren: LearnerRouteChildren = {
+  LearnerDashboardRoute: LearnerDashboardRoute,
+  LearnerProfileRoute: LearnerProfileRoute,
+  LearnerIndexRoute: LearnerIndexRoute,
+}
+
+const LearnerRouteWithChildren =
+  LearnerRoute._addFileChildren(LearnerRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   CoordinatorRoute: CoordinatorRouteWithChildren,
   InstructorRoute: InstructorRouteWithChildren,
-  LearnerIndexRoute: LearnerIndexRoute,
+  LearnerRoute: LearnerRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

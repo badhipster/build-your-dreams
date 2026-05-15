@@ -34,7 +34,7 @@ function personaFromPath(pathname: string): Persona {
 }
 
 const personaHomes: Record<Persona, string> = {
-  learner: "/",
+  learner: "/learner",
   instructor: "/instructor",
   coordinator: "/coordinator",
 };
@@ -60,7 +60,7 @@ function sampleNameFor(p: Persona) {
 
 const tabsByPersona: Record<Persona, { to: string; label: string; icon: React.ElementType; exact?: boolean }[]> = {
   learner: [
-    { to: "/", label: "Check-In", icon: ScanLine, exact: true },
+    { to: "/learner", label: "Check-In", icon: ScanLine, exact: true },
     { to: "/learner/dashboard", label: "Sessions", icon: CalendarDays },
     { to: "/learner/profile", label: "Profile", icon: User },
   ],

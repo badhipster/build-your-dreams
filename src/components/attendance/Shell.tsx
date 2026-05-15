@@ -1,7 +1,31 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { GraduationCap, ClipboardCheck, LayoutDashboard, ScanLine, CalendarDays, User, Users, Settings, Bell } from "lucide-react";
+import { ClipboardCheck, LayoutDashboard, ScanLine, CalendarDays, User, Users, Settings, Bell, ArrowLeft } from "lucide-react";
 
-type Persona = "learner" | "instructor" | "coordinator";
+export type Persona = "learner" | "instructor" | "coordinator";
+
+const personaTheme: Record<Persona, { label: string; bar: string; chipBg: string; chipText: string; accent: string }> = {
+  learner: {
+    label: "Learner",
+    bar: "bg-primary text-primary-foreground",
+    chipBg: "bg-primary-foreground/15",
+    chipText: "text-primary-foreground",
+    accent: "primary",
+  },
+  instructor: {
+    label: "Instructor",
+    bar: "bg-foreground text-background",
+    chipBg: "bg-background/15",
+    chipText: "text-background",
+    accent: "foreground",
+  },
+  coordinator: {
+    label: "Coordinator",
+    bar: "bg-success text-success-foreground",
+    chipBg: "bg-success-foreground/15",
+    chipText: "text-success-foreground",
+    accent: "success",
+  },
+};
 
 function personaFromPath(pathname: string): Persona {
   if (pathname.startsWith("/instructor")) return "instructor";
@@ -15,38 +39,23 @@ const personaHomes: Record<Persona, string> = {
   coordinator: "/coordinator",
 };
 
-export function PersonaSwitcher() {
-  const { pathname } = useLocation();
-  const active = personaFromPath(pathname);
-  const items: { id: Persona; label: string }[] = [
-    { id: "learner", label: "Learner" },
-    { id: "instructor", label: "Instructor" },
-    { id: "coordinator", label: "Coordinator" },
-  ];
+function PersonaTopBar({ persona }: { persona: Persona }) {
+  const t = personaTheme[persona];
   return (
-    <div className="flex items-center gap-2 px-4 pt-4">
-      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-        <GraduationCap className="h-4 w-4" />
-      </div>
-      <div className="flex-1">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Kraftshala · PGP-AI-LED-MKT-01</p>
-        <p className="text-xs font-semibold">Attendance</p>
-      </div>
-      <div className="flex rounded-full border bg-card p-0.5 text-xs">
-        {items.map((it) => (
-          <Link
-            key={it.id}
-            to={personaHomes[it.id]}
-            className={`rounded-full px-2.5 py-1 font-medium transition-colors ${
-              active === it.id ? "bg-foreground text-background" : "text-muted-foreground"
-            }`}
-          >
-            {it.label}
-          </Link>
-        ))}
+    <div className={`flex items-center gap-2 px-4 py-2.5 ${t.bar}`}>
+      <Link to="/" className={`inline-flex items-center gap-1 rounded-full ${t.chipBg} ${t.chipText} px-2 py-1 text-[11px] font-medium`}>
+        <ArrowLeft className="h-3 w-3" /> Switch role
+      </Link>
+      <div className="flex-1 text-right">
+        <p className="text-[10px] uppercase tracking-wider opacity-80">Signed in as</p>
+        <p className="text-xs font-semibold">{t.label} · {sampleNameFor(persona)}</p>
       </div>
     </div>
   );
+}
+
+function sampleNameFor(p: Persona) {
+  return p === "learner" ? "Diya Sharma" : p === "instructor" ? "Anika Rao" : "Vikram Nair";
 }
 
 const tabsByPersona: Record<Persona, { to: string; label: string; icon: React.ElementType; exact?: boolean }[]> = {
@@ -96,10 +105,12 @@ export function BottomTabBar() {
 }
 
 export function MobileShell({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation();
+  const persona = personaFromPath(pathname);
   return (
     <div className="min-h-screen bg-muted/40 md:flex md:items-center md:justify-center md:py-8">
       <div className="mx-auto flex min-h-screen w-full max-w-[420px] flex-col bg-background md:min-h-0 md:h-[860px] md:rounded-[2.25rem] md:border md:shadow-2xl md:overflow-hidden">
-        <PersonaSwitcher />
+        <PersonaTopBar persona={persona} />
         <main className="flex-1 overflow-y-auto">{children}</main>
         <BottomTabBar />
       </div>

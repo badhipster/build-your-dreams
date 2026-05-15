@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/learner")({
   head: () => ({
     meta: [
       { title: "Check In · Kraftshala Attendance" },

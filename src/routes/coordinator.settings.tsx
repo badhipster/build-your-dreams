@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MobileShell } from "@/components/attendance/Shell";
 import { Switch } from "@/components/ui/switch";
@@ -75,12 +75,12 @@ function Page() {
           </Group>
         </div>
 
-        <button className="flex items-center justify-between rounded-2xl border bg-card px-4 py-3 text-sm">
+        <Link to="/" className="flex items-center justify-between rounded-2xl border bg-card px-4 py-3 text-sm">
           <span className="inline-flex items-center gap-2 text-muted-foreground">
             <LogOut className="h-4 w-4" /> Sign out
           </span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </button>
+        </Link>
 
         <p className="px-1 text-[11px] text-muted-foreground">
           Threshold changes apply at the start of the next session day. Audit log captures every change.

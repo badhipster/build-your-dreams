@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MobileShell } from "@/components/attendance/Shell";
 import { AlertTriangle, CheckCircle2, Clock, Filter } from "lucide-react";
@@ -75,22 +75,7 @@ function Page() {
 
         <div className="overflow-hidden rounded-2xl border bg-card">
           {filtered.map((a, i) => (
-            <div key={a.id} className={`px-4 py-3 ${i !== 0 ? "border-t" : ""}`}>
-              <div className="flex items-start gap-2">
-                {a.status === "open" ? <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-warning-foreground" /> : <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 text-success" />}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{a.kind}</p>
-                    <SevDot s={a.severity} />
-                  </div>
-                  <p className="mt-0.5 truncate text-sm font-medium">{a.title}</p>
-                  <p className="text-[11px] text-muted-foreground">{a.meta}</p>
-                </div>
-                <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground">
-                  <Clock className="h-3 w-3" /> {a.age}
-                </span>
-              </div>
-            </div>
+            <AlertRow key={a.id} a={a} divider={i !== 0} />
           ))}
           {filtered.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
@@ -105,4 +90,28 @@ function Page() {
       </div>
     </MobileShell>
   );
+}
+
+function AlertRow({ a, divider }: { a: Alert; divider: boolean }) {
+  const body = (
+    <div className="flex items-start gap-2">
+      {a.status === "open" ? <AlertTriangle className="mt-0.5 h-3.5 w-3.5 text-warning-foreground" /> : <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 text-success" />}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{a.kind}</p>
+          <SevDot s={a.severity} />
+        </div>
+        <p className="mt-0.5 truncate text-sm font-medium">{a.title}</p>
+        <p className="text-[11px] text-muted-foreground">{a.meta}</p>
+      </div>
+      <span className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground">
+        <Clock className="h-3 w-3" /> {a.age}
+      </span>
+    </div>
+  );
+  const cls = `block px-4 py-3 ${divider ? "border-t" : ""}`;
+  if (a.status === "open") {
+    return <Link to="/coordinator" className={`${cls} hover:bg-muted/40`}>{body}</Link>;
+  }
+  return <div className={cls}>{body}</div>;
 }

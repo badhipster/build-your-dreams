@@ -152,3 +152,19 @@
     color: var(--color-foreground);
   }
 }
+
+/* Per-persona theme scopes — override --primary so every bg/text/ring-primary
+ * automatically retones inside the persona's shell. */
+.persona-learner {
+  /* keep root yellow primary */
+}
+.persona-instructor {
+  --primary: var(--foreground);
+  --primary-foreground: var(--background);
+  --ring: var(--foreground);
+}
+.persona-coordinator {
+  --primary: var(--success);
+  --primary-foreground: var(--success-foreground);
+  --ring: var(--success);
+}

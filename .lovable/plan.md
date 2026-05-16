@@ -1,65 +1,57 @@
-## What I'll build
+## Audit results
 
-A mobile-first prototype of a classroom attendance system for the Kraftshala AI-LED Marketing program, per `LOVABLE_PROMPT.md`. Three personas (Learner, Instructor, Coordinator), four screens, with a top persona switcher and persona-specific bottom tab bars.
+**Routes — all wired, no dead links:**
+- `/` (sign in) → `/learner`, `/instructor`, `/coordinator` ✓
+- Learner tabs: `/learner`, `/learner/dashboard`, `/learner/profile` ✓
+- Instructor tabs: `/instructor`, `/instructor/sessions`, `/instructor/settings` ✓
+- Coordinator tabs: `/coordinator`, `/coordinator/alerts`, `/coordinator/settings` ✓
+- "Switch role" pill in every top bar → `/` ✓
 
-## Routes (TanStack Start)
+**Problems found:**
 
-- `/` — Learner Check-In (default)
-- `/learner/dashboard` — Learner Attendance Dashboard
-- `/instructor` — Instructor Roster
-- `/coordinator` — Coordinator Dashboard
+1. **Theming leaks across personas.** Only the top bar is persona-colored. Inside content, `bg-primary` / `text-primary` is yellow everywhere — including the instructor "Live now" chip, the coordinator bar chart, every `v2` pill, and the bottom-tab active icon. Instructor app should read dark-foreground; Coordinator app should read green.
+2. **Dead buttons:**
+   - "Sign out" in `learner.profile`, `instructor.settings`, `coordinator.settings` — no `onClick`, doesn't return to `/`.
+   - Instructor `/instructor/sessions` rows aren't tappable even though the helper text says "Tap a confirmed session…".
+   - Coordinator `/coordinator/alerts` items aren't tappable; open items have no way to act, while `/coordinator` Needs-attention items open action dialogs for the same alerts.
+   - Learner profile rows "Program handbook" and "Raise a non-attendance concern" are buttons with no action.
+3. **Contrast nit:** "DS" avatar uses `bg-primary/15 text-primary` (yellow on light yellow).
 
-A persistent top bar on every page contains the **Learner / Instructor / Coordinator** view toggle. A persona-aware bottom tab bar:
-- Learner: Check-In, Sessions, Profile
-- Instructor: Roster, Sessions, Settings
-- Coordinator: Overview, Alerts, Settings
+## Fix plan
 
-Only the 4 screens above are fully fleshed out; other tabs are stubs (consistent with "don't add unnecessary features").
+### 1. Per-persona theme via CSS cascade (one change, app-wide)
+In `src/styles.css`, add three scope classes that override the shared color tokens for everything rendered inside the shell:
 
-## Screen details
+```css
+.persona-learner      { /* keep current yellow primary */ }
+.persona-instructor   { --primary: var(--foreground);
+                        --primary-foreground: var(--background);
+                        --ring: var(--foreground); }
+.persona-coordinator  { --primary: var(--success);
+                        --primary-foreground: var(--success-foreground);
+                        --ring: var(--success); }
+```
 
-**1. Learner Check-In (`/`)**
-- Header: "Session 14 · AI for B2B Marketing", date/time
-- Session details card so learners don't scan the wrong session
-- Primary "Scan to Check In" button → animated mock QR scan → success state
-- Default success: green card "You're marked Present · 9:02 AM"
-- Toggle/secondary view to preview the **Late** state: amber card "Marked Late · arrived 9:24 AM" + "This isn't right?" dispute link + "Why was I marked Late?" tooltip
+In `Shell.tsx`, apply the matching `persona-*` class on `MobileShell`'s outer container. This automatically retones every existing `bg-primary` / `text-primary` / `ring-primary` usage — bottom-tab active icon, chips, charts, "v2" pills, scan frame, buttons — without touching individual screens.
 
-**2. Instructor Roster (`/instructor`)**
-- Header: "Session 14 · 30 learners · 22 checked in"
-- **Offline banner** across the top: "Offline — 12 updates queued, will sync when online"
-- Scrollable list of 10 Indian-named learners with avatar + status icon (5 Present, 2 Late, 2 Absent, 1 to override)
-- Tap row → bottom sheet with Present / Late / Absent / Excused + reason textarea
-- Sticky bottom "Confirm Roster" button
+### 2. Wire up navigation gaps
+- `learner.profile`, `instructor.settings`, `coordinator.settings`: convert "Sign out" buttons into `<Link to="/">` (or `useNavigate` on click) so they return to the role picker.
+- `instructor.sessions`: wrap each non-upcoming row in `<Link to="/instructor">` so taps land on the roster (the only roster screen we have); leave upcoming rows non-interactive with a clear visual.
+- `coordinator.alerts`: make open items tappable → `<Link to="/coordinator">` so the coordinator lands on the Needs-attention list where the action dialogs live. Resolved items stay non-interactive.
+- Learner profile "Program handbook" / "Raise a non-attendance concern" rows: link to `/learner/dashboard` and `/learner/profile` respectively (no extra surface) OR drop the chevron and add a "coming soon" affordance — pick the link approach to keep all buttons functional.
 
-**3. Learner Attendance Dashboard (`/learner/dashboard`)**
-- Header: "Your Attendance · Cohort PGP-AI-LED-MKT-01"
-- Big 92% (24/26 sessions), subtitle "Eligible for completion certificate · threshold 80%"
-- Progress bar with 80% threshold marker
-- Session log (5 rows, mix of statuses); one row tagged "Dispute Raised · under review"
+### 3. Avatar contrast
+Switch the learner profile avatar to `bg-primary text-primary-foreground` so the yellow chip stays readable.
 
-**4. Coordinator Dashboard (`/coordinator`)**
-- 3 stat cards: today's attendance %, week average, learners on watch (<75%)
-- "Needs Attention" list with 3 items (unconfirmed roster 2h old, open dispute, learner at 4 absences) — each with a clear escalation CTA (Nudge / Review / Contact)
+### Files touched
+- `src/styles.css` — add 3 persona scope classes.
+- `src/components/attendance/Shell.tsx` — apply `persona-*` class on the shell wrapper.
+- `src/routes/learner.profile.tsx` — Sign out link, avatar contrast, link 2 stub rows.
+- `src/routes/instructor.sessions.tsx` — tappable session rows.
+- `src/routes/instructor.settings.tsx` — Sign out link.
+- `src/routes/coordinator.alerts.tsx` — tappable open-alert rows.
+- `src/routes/coordinator.settings.tsx` — Sign out link.
 
-## Design system
-
-Update `src/styles.css` tokens (oklch equivalents of the brand hexes):
-- `--primary`: warm yellow `#F5C518` (Kraftshala brand) with dark foreground
-- Status tokens: `--success` `#16A34A`, `--warning` `#F59E0B`, `--muted-status` `#94A3B8`, `--destructive` `#DC2626`
-- Light mode default, Inter via system sans stack, generous padding, rounded cards
-- Mobile-first max-width `420px` centered container with subtle device frame on desktop
-
-Use shadcn primitives already in the project (Button, Card, Sheet, Badge, Progress, Avatar, Tabs).
-
-## Out of scope
-
-No backend, no auth, no real QR scanning — all state is mocked in-memory. No Cloud enablement needed.
-
-## Files to add/modify
-
-- `src/styles.css` — token updates
-- `src/routes/__root.tsx` — wrap Outlet in mobile shell with PersonaSwitcher + BottomTabBar
-- `src/routes/index.tsx` — replace placeholder with Learner Check-In
-- `src/routes/learner.dashboard.tsx`, `src/routes/instructor.tsx`, `src/routes/coordinator.tsx`
-- `src/components/attendance/` — PersonaSwitcher, BottomTabBar, StatusBadge, OfflineBanner, MockQRScan, OverrideSheet, sample data
+### Out of scope
+- No new screens, no real auth, no backend.
+- Persona switching stays via the "Switch role" pill → `/`.

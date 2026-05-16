@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { MobileShell } from "@/components/attendance/Shell";
 import { Check, CalendarClock, Users } from "lucide-react";
 
@@ -66,7 +66,21 @@ function Page() {
 
         <div className="overflow-hidden rounded-2xl border bg-card">
           {ROWS.map((s, i) => (
-            <div key={s.id} className={`px-4 py-3 ${i !== 0 ? "border-t" : ""}`}>
+            <Row key={s.id} s={s} divider={i !== 0} />
+          ))}
+        </div>
+
+        <p className="px-1 text-[11px] text-muted-foreground">
+          Tap a confirmed session to view the full roster or raise a post-hoc correction (within 24 hours of EOS).
+        </p>
+      </div>
+    </MobileShell>
+  );
+}
+
+function Row({ s, divider }: { s: Row; divider: boolean }) {
+  const body = (
+    <>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">Session {s.n} · {s.title}</p>
@@ -88,14 +102,13 @@ function Page() {
                   </div>
                 </div>
               )}
-            </div>
-          ))}
-        </div>
-
-        <p className="px-1 text-[11px] text-muted-foreground">
-          Tap a confirmed session to view the full roster or raise a post-hoc correction (within 24 hours of EOS).
-        </p>
-      </div>
-    </MobileShell>
+    </>
+  );
+  const cls = `block px-4 py-3 ${divider ? "border-t" : ""}`;
+  if (s.state === "upcoming") {
+    return <div className={cls}>{body}</div>;
+  }
+  return (
+    <Link to="/instructor" className={`${cls} hover:bg-muted/40`}>{body}</Link>
   );
 }

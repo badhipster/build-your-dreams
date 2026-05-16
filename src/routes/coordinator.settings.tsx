@@ -18,7 +18,7 @@ function Page() {
     <MobileShell>
       <div className="flex flex-col gap-4 px-4 pt-4 pb-6">
         <header>
-          <h1 className="text-xl font-semibold tracking-tight">Cohort settings <span className="ml-1 rounded-full bg-primary/15 px-2 py-0.5 align-middle text-[10px] font-semibold text-primary">v2</span></h1>
+          <h1 className="text-xl font-semibold tracking-tight">Cohort settings</h1>
           <p className="text-xs text-muted-foreground">PGP-AI-LED-MKT-01 · Vikram Nair</p>
         </header>
 

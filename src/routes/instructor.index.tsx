@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { WifiOff, ChevronRight, CheckCircle2, ArrowRight } from "lucide-react";
 
-export const Route = createFileRoute("/instructor")({
+export const Route = createFileRoute("/instructor/")({
   head: () => ({
     meta: [{ title: "Roster · Kraftshala Attendance" }],
   }),

@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Textarea } from "@/components/ui/textarea";
 import { AlertTriangle, ArrowUpRight, TrendingUp, CheckCircle2, BellRing, Phone, Mail, CalendarPlus } from "lucide-react";
 
-export const Route = createFileRoute("/coordinator")({
+export const Route = createFileRoute("/coordinator/")({
   head: () => ({
     meta: [{ title: "Coordinator · Kraftshala Attendance" }],
   }),

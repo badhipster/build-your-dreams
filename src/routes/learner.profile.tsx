@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { MobileShell } from "@/components/attendance/Shell";
 import { Switch } from "@/components/ui/switch";
@@ -18,7 +18,7 @@ function Page() {
     <MobileShell>
       <div className="flex flex-col gap-4 px-4 pt-4 pb-6">
         <header className="flex items-center gap-3">
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/15 text-base font-semibold text-primary">DS</span>
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-base font-semibold text-primary-foreground">DS</span>
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Diya Sharma</h1>
             <p className="text-xs text-muted-foreground">Cohort PGP-AI-LED-MKT-01 · seat #14</p>
@@ -63,17 +63,17 @@ function Page() {
           </Group>
 
           <Group title="Program" border>
-            <ButtonRow icon={<BookOpen className="h-4 w-4" />} title="Program handbook" sub="Attendance policy · disputes · escalations" />
-            <ButtonRow icon={<Bell className="h-4 w-4" />} title="Raise a non-attendance concern" sub="Routes to your Student Success POC" />
+            <ButtonRow to="/learner/dashboard" icon={<BookOpen className="h-4 w-4" />} title="Program handbook" sub="Attendance policy · disputes · escalations" />
+            <ButtonRow to="/learner/dashboard" icon={<Bell className="h-4 w-4" />} title="Raise a non-attendance concern" sub="Routes to your Student Success POC" />
           </Group>
         </div>
 
-        <button className="flex items-center justify-between rounded-2xl border bg-card px-4 py-3 text-sm">
+        <Link to="/" className="flex items-center justify-between rounded-2xl border bg-card px-4 py-3 text-sm">
           <span className="inline-flex items-center gap-2 text-muted-foreground">
             <LogOut className="h-4 w-4" /> Sign out
           </span>
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
-        </button>
+        </Link>
 
         <p className="px-1 text-[11px] text-muted-foreground">
           Profile data syncs from the Kraftshala LMS. Reach out to programs@kraftshala.com to correct anything that looks off.
@@ -114,16 +114,16 @@ function Row({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: 
   );
 }
 
-function ButtonRow({ icon, title, sub }: { icon: React.ReactNode; title: string; sub: string }) {
+function ButtonRow({ icon, title, sub, to }: { icon: React.ReactNode; title: string; sub: string; to: string }) {
   return (
-    <button className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted/40">
+    <Link to={to} className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-muted/40">
       <span className="text-muted-foreground">{icon}</span>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{title}</p>
         <p className="text-[11px] text-muted-foreground">{sub}</p>
       </div>
       <ChevronRight className="h-4 w-4 text-muted-foreground" />
-    </button>
+    </Link>
   );
 }
 

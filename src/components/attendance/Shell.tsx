@@ -108,7 +108,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
   const persona = personaFromPath(pathname);
   return (
-    <div className="min-h-screen bg-muted/40 md:flex md:items-center md:justify-center md:py-8">
+    <div className={`persona-${persona} min-h-screen bg-muted/40 md:flex md:items-center md:justify-center md:py-8`}>
       <div className="mx-auto flex min-h-screen w-full max-w-[420px] flex-col bg-background md:min-h-0 md:h-[860px] md:rounded-[2.25rem] md:border md:shadow-2xl md:overflow-hidden">
         <PersonaTopBar persona={persona} />
         <main className="flex-1 overflow-y-auto">{children}</main>
